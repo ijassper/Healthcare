@@ -15,11 +15,11 @@ if img_file is not None:
     
     # 이미지를 AI가 볼 수 있도록 변환
     image = Image.open(img_file)
-    ''' 
-    GPT용 이미지 확인하는 방법
-    bytes_data = img_file.getvalue()
-    base64_image = base64.b64encode(bytes_data).decode('utf-8')
-    '''
+    
+    # GPT용 이미지 확인하는 방법
+    # bytes_data = img_file.getvalue()
+    # base64_image = base64.b64encode(bytes_data).decode('utf-8')
+    
 
     # 확인용 화면에 사진 띄우기
     st.image(image, caption="촬영된 음식", use_container_width=True)
