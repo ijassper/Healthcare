@@ -43,12 +43,20 @@ if img_file is not None:
     말투는 친절하고 전문적으로 해줘.
     """
 
+    st.write("사용가능한 모델 확인")
+    try:
+        for m in genai.list_models():
+            if 'generateContent' in m.supported_generation_methods:
+                st.write(m.name)
+    except Exception as e:
+        st.error(f"목록 가져오기 실패 : {e}")
+        
     # 실행버튼을 누르면 분석 시작
     if st.button("영양소 분석하기"):
         with st.spinner("AI 영양사가 분석 중입니다..."):
             try:
                 # Gemini 모델 불러오기
-                model = genai.GenerativeModel('gemini-1.5-flash')
+                model = genai.GenerativeModel('gemini-1.5-flash-latest')
 
                 # AI에게 질문과 이미지 전달
                 response = model.generate_content([prompt, image])
