@@ -56,7 +56,7 @@ if img_file is not None:
         with st.spinner("AI 영양사가 분석 중입니다..."):
             try:
                 # Gemini 모델 불러오기
-                model = genai.GenerativeModel('gemini-1.5-flash-latest')
+                model = genai.GenerativeModel('gemini-2.5-flash')
 
                 # AI에게 질문과 이미지 전달
                 response = model.generate_content([prompt, image])
