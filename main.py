@@ -23,7 +23,7 @@ with tab1:
 
 # [탭 2] 파일 업로드 기능
 with tab2:
-    upload_img = st.file_uploader("이미지 파일을 업로드 하세요.", tpye=['png','jpg','jpge'])
+    upload_img = st.file_uploader("이미지 파일을 업로드 하세요.", type=['png','jpg','jpge'])
     if upload_img:
         img_file = upload_img
 
