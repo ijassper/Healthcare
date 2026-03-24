@@ -6,7 +6,7 @@ from PIL import Image # Genai
 st.title("당뇨 케어 푸드 스캐너")
 st.markdown("음식사진을 찍거나 올려주세요. AI가 영양소를 분석해드립니다.")
 
-GOOGLE_API_KEY = "AIzaSyCVdVzlrPJiK0koRJiTBgXryCJW37dZTmE"
+GOOGLE_API_KEY = "AIzaSyCfH1ZOhTe3lOZ5PxWlOH_0DRaRo0KejiU"
 genai.configure(api_key=GOOGLE_API_KEY)
 
 # 탭 메뉴 만들기
