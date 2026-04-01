@@ -16,7 +16,7 @@ with st.sidebar:
 
     # 정보입력
     user_name = st.text_input("이름")
-    user_age = st.number_input("나이", value=15)
+    user_age = st.number_input("나이", value=20)
     user_gender = st.selectbox("성별",["남성","여성"])
 
     st.header("목표 설정")
