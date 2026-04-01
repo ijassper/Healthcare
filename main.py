@@ -6,7 +6,7 @@ from PIL import Image # Genai
 st.title("혈당 가이드")
 st.markdown("음식사진을 찍거나 올려주세요. AI가 영양소를 분석해드립니다.")
 
-GOOGLE_API_KEY = "AIzaSyCKoHvmI6WtqcbIGHtUjjjrRUd39Q_ETkU"
+GOOGLE_API_KEY = st.secrets["GOOGLE_API_KEY"]
 genai.configure(api_key=GOOGLE_API_KEY)
 
 # 사이드 바 : 사용자 프로필 작성
