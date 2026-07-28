@@ -2,6 +2,10 @@ import streamlit as st # 스트림릿 라이브러리 추가
 # import base64 # 이미지를 텍스트로 변환 openia = GPT
 import google.generativeai as genai
 from PIL import Image # Genai
+from notion_client import Client
+
+# 노션 설정
+notion = Client(auth="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")
 
 st.title("혈당 가이드")
 st.markdown("음식사진을 찍거나 올려주세요. AI가 영양소를 분석해드립니다.")
@@ -103,3 +107,12 @@ if img_file is not None:
                 st.write(response.text)
             except Exception as e:
                 st.error(f"오류가 발생했습니다.: {e}")
+
+if st.button("노션에 저장")
+    notion.pages.create(
+        parent={"database_id","3ab9ad098eee80b5a5d4e5b18f75802b"}
+        properties={
+            "식단명":{"title":[{"text":{"content": menu}}]}
+        }
+    )
+    st.success("노션 저장 완료")
