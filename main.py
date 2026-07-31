@@ -117,19 +117,23 @@ if img_file is not None:
     
     # 저장 로직 (노션에 분석 결과 저장)
     if 'ai_result' in st.session_state:
-        st.write(st.session_state.ai_result)
+        result_text = st.session_state.ai_result
         
         if st.button("노션에 저장"):
-        
-            # AI의 결과(JSON)를 파이썬 딕셔너리 자료형으로 변환
-            data = json.loads(st.session_state.ai_result)
-            
-            notion.pages.create(
-                parent={"database_id": "3ab9ad098eee80b5a5d4e5b18f75802b"},
-                properties={
-                    "Name": {"title": [{"text": {"content": data["식단명"]}}]},
-                    "영양정보": {"rich_text": [{"text": {"content": data["영양정보"]}}]},
-                    "칼로리": {"number": int(data["칼로리"])}
-                }
-            )
-            st.success("노션 저장 완료")
+            try:
+                # '{'가 시작하는 위치부터 끝까지 자르기
+                json_str = result_text[result_text.find("{"):result_text.rfind("}")+1]
+                data = json.loads(json_str) # 이제 순수한 JSON만 파싱
+                
+                # 2. 노션에 저장
+                notion.pages.create(
+                    parent={"database_id": "3ab9ad098eee80b5a5d4e5b18f75802b"},
+                    properties={
+                        "식단명": {"title": [{"text": {"content": data["식단명"]}}]},
+                        "영양정보": {"rich_text": [{"text": {"content": data["영양정보"]}}]},
+                        "칼로리": {"number": int(data["칼로리"])}
+                    }
+                )
+                st.success("노션 저장 완료!")
+            except Exception as e:
+                st.error(f"데이터 형식이 올바르지 않아 저장할 수 없습니다: {e}")
