@@ -1,9 +1,11 @@
 import streamlit as st # 스트림릿 라이브러리 추가
 # import base64 # 이미지를 텍스트로 변환 openia = GPT
 import google.generativeai as genai
+import json
 from PIL import Image # Genai
 from notion_client import Client
-import json
+from datetime import datetime
+
 
 # 노션 설정
 notion = Client(auth="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")
@@ -118,6 +120,8 @@ if img_file is not None:
     # 저장 로직 (노션에 분석 결과 저장)
     if 'ai_result' in st.session_state:
         result_text = st.session_state.ai_result
+        st.write("### AI 분석 결과")
+        st.write(result_text) 
         
         if st.button("노션에 저장"):
             try:
@@ -132,6 +136,7 @@ if img_file is not None:
                         "식단명": {"title": [{"text": {"content": data["식단명"]}}]},
                         "영양정보": {"rich_text": [{"text": {"content": data["영양정보"]}}]},
                         "칼로리": {"number": int(data["칼로리"])}
+                        "기록날짜": {"date": {"start": datetime.now().strftime("%Y-%m-%d")}}
                     }
                 )
                 st.success("노션 저장 완료!")
