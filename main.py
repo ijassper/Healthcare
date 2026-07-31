@@ -98,7 +98,7 @@ if img_file is not None:
     #except Exception as e:
     #    st.error(f"목록 가져오기 실패 : {e}")
         
-    # 실행버튼을 누르면 분석 시작
+    # 분석 버튼 로직
     if st.button("영양소 분석하기"):
         with st.spinner("AI 영양사가 분석 중입니다..."):
             try:
@@ -107,18 +107,19 @@ if img_file is not None:
 
                 # AI에게 질문과 이미지 전달
                 response = model.generate_content([prompt, image])
-
-                # 결과 출력
-                st.success("분석 완료!")
+                
+                # 분석결과 세션에 저장
                 st.session_state.ai_result = response.text
-                st.write(response.text)
+                st.success("분석 완료!")    
             except Exception as e:
                 st.error(f"오류가 발생했습니다.: {e}")
     
-    # 노션에 분석 결과 저장
-    if st.button("노션에 저장"):
-        if 'ai_result' in st.session_state:
-
+    # 저장 로직 (노션에 분석 결과 저장)
+    if 'ai_result' in st.session_state:
+        st.write(st.session_state.ai_result)
+        
+        if st.button("노션에 저장"):
+        
             # AI의 결과(JSON)를 파이썬 딕셔너리 자료형으로 변환
             data = json.loads(st.session_state.ai_result)
             
