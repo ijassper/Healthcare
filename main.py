@@ -3,6 +3,7 @@ import streamlit as st # 스트림릿 라이브러리 추가
 import google.generativeai as genai
 from PIL import Image # Genai
 from notion_client import Client
+import json
 
 # 노션 설정
 notion = Client(auth="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")
