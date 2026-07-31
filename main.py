@@ -73,15 +73,21 @@ if img_file is not None:
     - 성별: {user_gender}
     - 오늘 목표 당 섭취량: {daily_goal}g
         
-    이 정보를 바탕으로 사진 속 음식을 분석해서 다음 형식으로 대답해줘:
-
+    분석을 수행한 뒤, 사용자가 읽기 좋은 결과와 데이터베이스 기록용 JSON 결과를 함께 제공해줘.
+    
     1. [인사 및 요약]: {user_name}님, 보여주신 음식의 정보를 알려드릴게요.
     2. [영양소 정보]: 추정 당류 함량 (g), 추정 탄수화물 함량 (g), 칼로리(kcal)
     3. [개인 맞춤 분석]: 이 음식이 사용자의 목표치({daily_goal}g)에서 몇 %나 차지하는지 계산해줘.
        (예: 이 쿠기 한 개는 {user_name}님의 하루 목표 섭취량의 60%에 달합니다!)
     4. [영영사의 조언]: 사용자의 나이와 목표를 고려해서 혈당을 덜 올리는 섭취 꿀팁을 알려줘.
 
-    대답은 아주 친절하고 전문적으로 해줘.
+    [분석 리포트] : 위 1~4번 형식으로 사용자에게 보여줄 친절한 메세지를 작성해줘.
+    [JSON 데이터] : 아래 JSON 형식으로만 데이터를 작성해줘. JSON 외에 다른 설명은 절대 추가하지 마.
+    {{
+        "식단명": "음식 이름",
+        "영양정보": "당류 0g, 탄수화물 0g",
+        "칼로리": 0
+    }}
     """
 
     #st.write("사용가능한 모델 확인")
@@ -104,15 +110,24 @@ if img_file is not None:
 
                 # 결과 출력
                 st.success("분석 완료!")
+                st.session_state.ai_result = response.text
                 st.write(response.text)
             except Exception as e:
                 st.error(f"오류가 발생했습니다.: {e}")
+    
+    # 노션에 분석 결과 저장
+    if st.button("노션에 저장"):
+        if 'ai_result' in st.session_state:
 
-if st.button("노션에 저장"):
-    notion.pages.create(
-        parent={"database_id": "3ab9ad098eee80b5a5d4e5b18f75802b"},
-        properties={
-            "Name": {"title": [{"text": {"content": f"{user_name}님의 식단 기록"}}]} 
-        }
-    )
-    st.success("노션 저장 완료")
+            # AI의 결과(JSON)를 파이썬 딕셔너리 자료형으로 변환
+            data = json.loads(st.session_state.ai_result)
+            
+            notion.pages.create(
+                parent={"database_id": "3ab9ad098eee80b5a5d4e5b18f75802b"},
+                properties={
+                    "Name": {"title": [{"text": {"content": data["식단명"]}}]},
+                    "영양정보": {"rich_text": [{"text": {"content": data["영양정보"]}}]},
+                    "칼로리": {"number": int(data["칼로리"])}
+                }
+            )
+            st.success("노션 저장 완료")
