@@ -108,11 +108,11 @@ if img_file is not None:
             except Exception as e:
                 st.error(f"오류가 발생했습니다.: {e}")
 
-if st.button("노션에 저장")
+if st.button("노션에 저장"):
     notion.pages.create(
-        parent={"database_id","3ab9ad098eee80b5a5d4e5b18f75802b"}
+        parent={"database_id": "3ab9ad098eee80b5a5d4e5b18f75802b"},
         properties={
-            "식단명":{"title":[{"text":{"content": menu}}]}
+            "Name": {"title": [{"text": {"content": f"{user_name}님의 식단 기록"}}]} 
         }
     )
     st.success("노션 저장 완료")
