@@ -135,7 +135,7 @@ if img_file is not None:
                     properties={
                         "식단명": {"title": [{"text": {"content": data["식단명"]}}]},
                         "영양정보": {"rich_text": [{"text": {"content": data["영양정보"]}}]},
-                        "칼로리": {"number": int(data["칼로리"])}
+                        "칼로리": {"number": int(data["칼로리"])},
                         "기록날짜": {"date": {"start": datetime.now().strftime("%Y-%m-%d")}}
                     }
                 )
