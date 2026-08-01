@@ -126,7 +126,7 @@ if img_file is not None:
         data = json.loads(json_str)
         
         st.write("### AI 분석 결과")
-        st.write(data) 
+        st.write(result_text) 
         
         if st.button("노션에 저장"):
             try:
