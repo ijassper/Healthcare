@@ -121,15 +121,16 @@ if img_file is not None:
     # 저장 로직 (노션에 분석 결과 저장)
     if 'ai_result' in st.session_state:
         result_text = st.session_state.ai_result
-        # '{'가 시작하는 위치부터 끝까지 자르기
-        json_str = result_text[result_text.find("{"):result_text.rfind("}")+1]
-        data = json.loads(json_str)
         
         st.write("### AI 분석 결과")
         st.write(result_text) 
         
         if st.button("노션에 저장"):
             try:
+                # '{'가 시작하는 위치부터 끝까지 자르기
+                json_str = result_text[result_text.find("{"):result_text.rfind("}")+1]
+                data = json.loads(json_str)
+                
                 # 노션에 저장
                 notion.pages.create(
                     parent={"database_id": "3ab9ad098eee80b5a5d4e5b18f75802b"},
