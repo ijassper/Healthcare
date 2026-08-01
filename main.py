@@ -121,22 +121,23 @@ if img_file is not None:
     # 저장 로직 (노션에 분석 결과 저장)
     if 'ai_result' in st.session_state:
         result_text = st.session_state.ai_result
+        # '{'가 시작하는 위치부터 끝까지 자르기
+        json_str = result_text[result_text.find("{"):result_text.rfind("}")+1]
+        data = json.loads(json_str)
+        
         st.write("### AI 분석 결과")
-        st.write(result_text) 
+        st.write(data) 
         
         if st.button("노션에 저장"):
             try:
-                # '{'가 시작하는 위치부터 끝까지 자르기
-                json_str = result_text[result_text.find("{"):result_text.rfind("}")+1]
-                data = json.loads(json_str) # 이제 순수한 JSON만 파싱
-                
-                # 2. 노션에 저장
+                # 노션에 저장
                 notion.pages.create(
                     parent={"database_id": "3ab9ad098eee80b5a5d4e5b18f75802b"},
                     properties={
                         "식단명": {"title": [{"text": {"content": data["식단명"]}}]},
                         "영양정보": {"rich_text": [{"text": {"content": data["영양정보"]}}]},
                         "칼로리": {"number": int(data["칼로리"])},
+                        "분석내용": {"rich_text": [{"text": {"content": data["분석내용"]}}]},
                         "기록날짜": {"date": {"start": datetime.now().strftime("%Y-%m-%d")}}
                     }
                 )
