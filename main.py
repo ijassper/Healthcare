@@ -54,7 +54,7 @@ with tab3:
         "selectable":True,
         "initalView":"dayGridMonth",
     }
-    state = calendar(event,options=calendar_options)
+    state = calendar(events,options=calendar_options)
     
     try:
         #results = notion.databases.query(database_id="3ab9ad098eee80b5a5d4e5b18f75802b")
