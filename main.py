@@ -30,7 +30,7 @@ with st.sidebar:
     daily_goal = st.text_input("하루 목표 당 섭취량(g)", value=25)
     
 # 탭 메뉴 만들기
-tab1, tab2 tab3 = st.tabs(["카메라로 촬영","갤러리에서 업로드","혈당 관리"])
+tab1, tab2, tab3 = st.tabs(["카메라로 촬영","갤러리에서 업로드","혈당 관리"])
 
 # 사진 찍기
 img_file = None
