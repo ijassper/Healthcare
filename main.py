@@ -53,6 +53,8 @@ with tab3:
         results = notion.databases.query(database_id="3ab9ad098eee80b5a5d4e5b18f75802b")
         st.write(results)    
     #st.json(results)
+    except AttributeError:
+        st.write(dir(notion.databases))
     except Exception as e:
         st.error(f"에러 발생: {e}")
 
