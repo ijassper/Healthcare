@@ -51,8 +51,9 @@ with tab3:
     # "노션데이터 불러오기"
     try:
         #results = notion.databases.query(database_id="3ab9ad098eee80b5a5d4e5b18f75802b")
+        db_id = "3ab9ad098eee80b5a5d4e5b18f75802b"
         results = notion.request(
-            path = f"databases/3ab9ad098eee80b5a5d4e5b18f75802b/query",
+            path = f"databases/{db_id}/query",
             method = "POST"
         )
         st.write(results)    
@@ -60,7 +61,7 @@ with tab3:
     # except AttributeError:
     #     st.write(dir(notion.databases))
     except Exception as e:
-        st.error(f"에러 발생: {e}")
+        st.error(f"에러 메세지: {e}")
 
 if img_file is not None:
     
