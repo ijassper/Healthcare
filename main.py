@@ -49,8 +49,8 @@ with tab2:
 
 with tab3:
     # "노션데이터 불러오기"
-    results = notion.databases.query(database_id="3ab9ad098eee80b5a5d4e5b18f75802b")
-    st.write(results)
+    results = notion.databases.query({"database_id":"3ab9ad098eee80b5a5d4e5b18f75802b"})
+    st.json(results)
 
 if img_file is not None:
     
