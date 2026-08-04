@@ -50,10 +50,9 @@ with tab2:
 with tab3:
     # "노션데이터 불러오기"
     try:
-        results = notion.databases.query(
-            **{"database_id": "3ab9ad098eee80b5a5d4e5b18f75802b"}
-        )
-        st.json(results)
+        results = notion.databases.query(database_id="3ab9ad098eee80b5a5d4e5b18f75802b")
+        st.write(results)    
+    #st.json(results)
     except Exception as e:
         st.error(f"에러 발생: {e}")
 
