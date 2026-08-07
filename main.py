@@ -38,16 +38,28 @@ img_file = None
 
 # [탭 1] 카메라 기능
 with tab1:
+    db_id = "3ab9ad098eee80b5a5d4e5b18f75802b"
+    token = "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" # 시크릿으로 바꾸기 전 테스트용
+    
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json",
+        "Notion-Version": "2022-06-28"
+    }
+    
     try:
-        results = notion.databases.query(database_id="3ab9ad098eee80b5a5d4e5b18f75802b")
-        st.write(results)
+        url = f"https://api.notion.com/v1/databases/{db_id}/query"
+        response = requests.post(url, headers=headers)
+        
+        if response.status_code == 200:
+            results = response.json()
+            st.write("데이터 조회 성공!")
+            # 여기서 데이터를 달력용 리스트로 변환하면 됩니다.
+        else:
+            st.error(f"API 호출 실패: {response.status_code} - {response.text}")
+            
     except Exception as e:
-        try:
-            # 앞의 슬래시를 제거!
-            results = notion.request(path=f"databases/3ab9ad098eee80b5a5d4e5b18f75802b/query", method="POST")
-            st.write(results)
-        except Exception as e2:
-            st.error(f"결국 데이터 조회 실패: {e2}")
+        st.error(f"에러 발생: {e}")
         
     calendar_options = {
         "headerToolbar": {
