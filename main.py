@@ -42,7 +42,12 @@ with tab1:
         results = notion.databases.query(database_id="3ab9ad098eee80b5a5d4e5b18f75802b")
         st.write(results)
     except Exception as e:
-        st.error(f"메시지: {e}")
+        try:
+            # 앞의 슬래시를 제거!
+            results = notion.request(path=f"databases/3ab9ad098eee80b5a5d4e5b18f75802b/query", method="POST")
+            st.write(results)
+        except Exception as e2:
+            st.error(f"결국 데이터 조회 실패: {e2}")
         
     calendar_options = {
         "headerToolbar": {
