@@ -3,4 +3,4 @@ google-generativeai
 Pillow
 notion-client
 streamlit-calendar
-request
+requests
