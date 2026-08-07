@@ -53,7 +53,7 @@ with tab1:
         
         if response.status_code == 200:
             results = response.json()
-            st.write("데이터 조회 성공!")
+            st.write(results)
             # 여기서 데이터를 달력용 리스트로 변환하면 됩니다.
         else:
             st.error(f"API 호출 실패: {response.status_code} - {response.text}")
