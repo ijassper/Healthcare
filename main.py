@@ -37,38 +37,27 @@ img_file = None
 
 # [탭 1] 카메라 기능
 with tab1:
-    camera_img = st.camera_input("음식을 촬영해주세요")
-    if camera_img:
-        img_file = camera_img
+    calendar_options = {
+        "headerToolbar": {
+            "left": "today prev,next",
+            "center": "title",
+            "right": "dayGridMonth,dayGridWeek",
+        },
+        "initialView": "dayGridMonth",
+    }
+    
+    # 2. 달력 출력
+    state = calendar(events=[], options=calendar_options) 
 
 # [탭 2] 파일 업로드 기능
 with tab2:
+    camera_img = st.camera_input("음식을 촬영해주세요")
+    if camera_img:
+        img_file = camera_img
+        
     upload_img = st.file_uploader("이미지 파일을 업로드 하세요.", type=['png','jpg','jpge'])
     if upload_img:
         img_file = upload_img
-
-with tab3:
-    # "노션데이터 불러오기"
-    calendar_options = {
-        "editable":False,
-        "selectable":True,
-        "initalView":"dayGridMonth",
-    }
-    state = calendar(events=[],options=calendar_options)
-    
-    try:
-        #results = notion.databases.query(database_id="3ab9ad098eee80b5a5d4e5b18f75802b")
-        db_id = "3ab9ad098eee80b5a5d4e5b18f75802b"
-        results = notion.request(
-            path = f"databases/{db_id}/query",
-            method = "POST"
-        )
-        st.write(results)    
-    #st.json(results)
-    # except AttributeError:
-    #     st.write(dir(notion.databases))
-    except Exception as e:
-        st.error(f"에러 메세지: {e}")
 
 if img_file is not None:
     
