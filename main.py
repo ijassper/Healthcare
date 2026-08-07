@@ -37,6 +37,16 @@ img_file = None
 
 # [탭 1] 카메라 기능
 with tab1:
+    try:
+        db_id = "3ab9ad098eee80b5a5d4e5b18f75802b"
+        results = notion.request(
+            path=f"databases/{db_id}/query", 
+            method="POST"
+        )
+        st.write(results)
+    except Exception as e:
+        st.error(f"메시지: {e}")
+        
     calendar_options = {
         "headerToolbar": {
             "left": "today prev,next",
