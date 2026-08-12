@@ -53,7 +53,7 @@ with tab1:
         
         if response.status_code == 200:
             results = response.json()
-            st.write(results)
+            # st.write(results)
         else:
             st.error(f"API 호출 실패: {response.status_code} - {response.text}")
             
