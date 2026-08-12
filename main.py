@@ -53,7 +53,7 @@ with tab1:
         
         if response.status_code == 200:
             results = response.json()
-            # st.write(results)
+            st.write(results)
         else:
             st.error(f"API 호출 실패: {response.status_code} - {response.text}")
             
@@ -68,7 +68,7 @@ with tab1:
         
         try:
             # 노션의 식단명 데이터 가져오기
-            title = props.get('식단명', {}).get('title', [{}])[0].get('plain_text', '식단')
+            title = props.get('식단명', {}).get('title', [{}])[0].get('plain_text', '')
             # 노션의 기록날짜 데이터 가져오기
             start_date = props.get('기록날짜', {}).get('date', {}).get('start', '')
             
