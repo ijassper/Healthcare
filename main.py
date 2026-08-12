@@ -71,12 +71,15 @@ with tab1:
             title = props.get('식단명', {}).get('title', [{}])[0].get('plain_text', '')
             # 노션의 기록날짜 데이터 가져오기
             start_date = props.get('기록날짜', {}).get('date', {}).get('start', '')
+            # 분석내용 가져오기
+            analysis_content = props.get('분석내용', {}).get('rich_text', [{}])[0].get('plain_text', '')
             
             if start_date: # 날짜가 있는 데이터만 달력에 추가
                 events.append({
                     "title": title,
                     "start": start_date,
                     "end": start_date
+                    "rich_text": {"content": analysis_content }  # 분석내용
                 })
         except Exception as e:
             continue # 데이터가 일부 없어도 에러나지 않게 건너뜀
@@ -92,6 +95,14 @@ with tab1:
     
     # 2. 달력 출력
     state = calendar(events=events, options=calendar_options)
+
+    def show_analysis(content):
+        st.write(content)
+    
+    if state.get("eventClick"):
+        event_info = state["eventClick"]
+        analysis_text = event_info["event"]["rich_text"]["content"]
+        show_analysis(analysis_text)        
 
 # [탭 2] 카메라 촬영 기능
 with tab2:
