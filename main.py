@@ -77,7 +77,7 @@ with tab1:
             if start_date: # 날짜가 있는 데이터만 달력에 추가
                 events.append({
                     "title": title,
-                    "start": date,
+                    "start": start_date,
                     "extendedProps": { 
                         "content": analysis_content # 분석내용
                     }
