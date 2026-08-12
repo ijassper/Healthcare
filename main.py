@@ -77,11 +77,10 @@ with tab1:
             if start_date: # 날짜가 있는 데이터만 달력에 추가
                 events.append({
                     "title": title,
-                    "start": start_date,
-                    "end": start_date
-                    "extendedProps": {
-                        "content": analysis_content  # 분석내용
-                    }  
+                    "start": date,
+                    "extendedProps": { 
+                        "content": analysis_content # 분석내용
+                    }
                 })
         except Exception as e:
             continue # 데이터가 일부 없어도 에러나지 않게 건너뜀
