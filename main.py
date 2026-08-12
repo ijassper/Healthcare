@@ -101,9 +101,11 @@ with tab1:
         st.write(content)
     
     if state.get("eventClick"):
-        event_info = state["eventClick"]
-        analysis_text = event_info["event"]["extendedProps"]["content"]
-        show_analysis(analysis_text)        
+    event_info = state["eventClick"]
+    analysis_text = event_info["event"]["extendedProps"]["content"]
+    
+    # 팝업 호출
+    show_analysis(analysis_text)        
 
 # [탭 2] 카메라 촬영 기능
 with tab2:
