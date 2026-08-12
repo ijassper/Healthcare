@@ -87,13 +87,6 @@ with tab1:
     
     def show_analysis(content):
         st.write(content)
-    
-    if state.get("eventClick"):
-        event_info = state["eventClick"]
-        analysis_text = event_info["event"]["extendedProps"]["content"]
-        
-        # 팝업 호출
-        show_analysis(analysis_text)        
             
     calendar_options = {
         "headerToolbar": {
@@ -106,6 +99,13 @@ with tab1:
     
     # 2. 달력 출력
     state = calendar(events=events, options=calendar_options)
+
+    #if state.get("eventClick"):
+    #    event_info = state["eventClick"]
+    #    analysis_text = event_info["event"]["extendedProps"]["content"]
+    #    
+    #    # 팝업 호출
+    #    show_analysis(analysis_text)        
 
 # [탭 2] 카메라 촬영 기능
 with tab2:
