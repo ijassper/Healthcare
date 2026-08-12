@@ -53,13 +53,34 @@ with tab1:
         
         if response.status_code == 200:
             results = response.json()
-            st.write(results)
+            # st.write(results)
         else:
             st.error(f"API 호출 실패: {response.status_code} - {response.text}")
             
     except Exception as e:
         st.error(f"에러 발생: {e}")
         
+    events = [] # 빈 달력 이벤트 리스트 생성
+    raw_data = results.get('results', []) # 결과 리스트 가져오기
+    
+    for item in raw_data:
+        props = item.get('properties', {})
+        
+        try:
+            # 노션의 식단명 데이터 가져오기
+            title = props.get('식단명', {}).get('title', [{}])[0].get('plain_text', '식단')
+            # 노션의 기록날짜 데이터 가져오기
+            start_date = props.get('기록날짜', {}).get('date', {}).get('start', '')
+            
+            if start_date: # 날짜가 있는 데이터만 달력에 추가
+                events.append({
+                    "title": title,
+                    "start": start_date,
+                    "end": start_date
+                })
+        except Exception as e:
+            continue # 데이터가 일부 없어도 에러나지 않게 건너뜀
+            
     calendar_options = {
         "headerToolbar": {
             "left": "today prev,next",
@@ -70,7 +91,7 @@ with tab1:
     }
     
     # 2. 달력 출력
-    state = calendar(events=[], options=calendar_options) 
+    state = calendar(events=events, options=calendar_options)
 
 # [탭 2] 카메라 촬영 기능
 with tab2:
