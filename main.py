@@ -79,7 +79,7 @@ with tab1:
                     "title": title,
                     "start": start_date,
                     "end": start_date
-                    "extendedProps": {"content": analysis_content }  # 분석내용
+                    "extendedProps": {"content": analysis_content}  # 분석내용
                 })
         except Exception as e:
             continue # 데이터가 일부 없어도 에러나지 않게 건너뜀
