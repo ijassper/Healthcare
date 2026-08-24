@@ -11,6 +11,8 @@ from streamlit_calendar import calendar
 # 노션 설정
 notion = Client(auth="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")
 
+st.set_page_config(layout="centered", initial_sidebar_state="collapsed")
+
 st.title("혈당 가이드")
 st.markdown("음식사진을 찍거나 올려주세요. AI가 영양소를 분석해드립니다.")
 
@@ -90,11 +92,14 @@ with tab1:
             
     calendar_options = {
         "headerToolbar": {
-            "left": "today prev,next",
+            "left": "prev,next",
             "center": "title",
-            "right": "dayGridMonth,dayGridWeek",
+            "right": "",
         },
         "initialView": "dayGridMonth",
+        "aspecRatio":0.8,
+        "height":"auto",
+        "dayMaxEvents":True,
     }
     
     # 2. 달력 출력
