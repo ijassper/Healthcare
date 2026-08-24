@@ -100,12 +100,26 @@ with tab1:
     # 2. 달력 출력
     state = calendar(events=events, options=calendar_options)
 
+    # 분석내용을 보여주는 초기 상태 설정
+    if 'show_detail' not in st.session_state:
+        st.session_state.show_detail = False
+
+    # 클릭 이벤트 발생 시
     if state.get("eventClick"):
-        event_info = state["eventClick"]
-        analysis_text = event_info["event"]["extendedProps"]["content"]
+        # 같은 식단을 클릭했는지 확인
+        clicked_title = state["eventClick"]["event"]["title"]
+
+        # 분석 내용 토글 기능
+        st.session_state.show_detail = not st.session_state.show_detail
+        analysis_text = state["eventClick"]["event"]["extendedProps"]["content"]
+        st.session_state.current_analysis = analysis_text
         
+    if st.session_state.show_detail:
+        st.divider()
+        st.write("### 상세 분석 리포트")
+        st.write(st.session_state.current_analysis)
         # 팝업 호출
-        show_analysis(analysis_text)        
+        # show_analysis(analysis_text)        
 
 # [탭 2] 카메라 촬영 기능
 with tab2:
