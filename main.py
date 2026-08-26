@@ -38,38 +38,28 @@ tab1, tab2, tab3, tab4 = st.tabs(["대시보드","혈당 관리","카메라로 �
 # 사진 찍기
 img_file = None
 
+# 노션DB에서 데이터 가져오는 경로
+url = f"https://api.notion.com/v1/databases/{db_id}/query"
+
 # [탭 1] 대시보드
 with tab1:
-    st.subheader("오늘의 건강 리포트")
+    st.subheader("나의 건강 리포트")
+
+    try:
+        results = notion.request(path=url,method="POST")
+        items = result.get('results', [])
+
+        if items:
+            st.write(f"총 {len(items)}개의 식단 기록이 있습니다.")
+
+            # 최근 5개 식단 칼로리 합계
+            total_cal = sum(item['properties']['칼로리']['number'] for item in items if item['properties']['칼로리']['number'])
+            st.metric("누적 칼로리", f"{total_cal} kcal")
+        else:
+            st.info("아직 기록된 식단이 없어요. 식단 기록을 시작해보세요.")
+except Exception as e:
+    st.error("데이터를 불러오지 못했습니다.")
     
-    if 'ai_result' in st.session_state:
-        # 영양정보에서 당류 숫자만 추출
-        def extract_sugar(text):
-            match = re.search(r'당류\s*(\d+)g', text)
-            return int(match.group(1)) if match else 0    
-
-        try:
-            result_text = st.session_state.ai_result
-            start = result_text.find("{")
-            end = result_text.rfind("}") + 1
-            data = json.loads(result_text[start:end])
-            st.write(data)
-
-            col1, col2 = st.columns(2)
-            col1.metric("오늘의 칼로리", f"data['칼로리']kcal")
-            col2.metric("당류 함량", data['영양정보'].split(',')[0])
-
-            # 위험도 시각화
-            sugar_val = extract_sugar(data['영양정보'])
-            goal = int(daily_goal)
-            ratio = sugar_val / goal
-
-            st.write("### 혈당 스파이크 위험도")
-            st.progress(min(ratio,1.0))
-        
-        except Exception as e:
-            st.warning("분석 데이터를 불러오느 중 오류가 발생했습니다.")
-
 # [탭 2] 카메라 기능
 with tab2:
     db_id = "3ab9ad098eee80b5a5d4e5b18f75802b"
@@ -82,7 +72,6 @@ with tab2:
     }
     
     try:
-        url = f"https://api.notion.com/v1/databases/{db_id}/query"
         response = requests.post(url, headers=headers)
         
         if response.status_code == 200:
