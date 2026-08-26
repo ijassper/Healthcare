@@ -35,22 +35,41 @@ with st.sidebar:
 # 탭 메뉴 만들기
 tab1, tab2, tab3, tab4 = st.tabs(["대시보드","혈당 관리","카메라로 촬영","갤러리에서 업로드"])
 
-db_id = "3ab9ad098eee80b5a5d4e5b18f75802b"
-token = "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" # 시크릿으로 바꾸기 전 테스트용
+def fetch_notion_data():
+    db_id = "3ab9ad098eee80b5a5d4e5b18f75802b"
+    token = "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" # 시크릿으로 바꾸기 전 테스트용
+    # 노션DB에서 데이터 가져오는 경로
+    url = f"https://api.notion.com/v1/databases/{db_id}/query"
+
+    headers = {
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json",
+            "Notion-Version": "2022-06-28"
+    }
+        
+    try:
+        response = requests.post(url, headers=headers)
+        
+        if response.status_code == 200:
+            results = response.json().get('results', [])
+            return results
+            # st.write(results)
+        else:
+            st.error(f"API 호출 실패: {response.status_code} - {response.text}")
+                
+    except Exception as e:
+        st.error(f"에러 발생: {e}")
+        
 
 # 사진 찍기
 img_file = None
-
-# 노션DB에서 데이터 가져오는 경로
-url = f"https://api.notion.com/v1/databases/{db_id}/query"
 
 # [탭 1] 대시보드
 with tab1:
     st.subheader("나의 건강 리포트")
 
     try:
-        results = notion.request(path=url,method="POST")
-        items = result.get('results', [])
+        items = fetch_notion_data()
 
         if items:
             st.write(f"총 {len(items)}개의 식단 기록이 있습니다.")
@@ -65,26 +84,9 @@ with tab1:
     
 # [탭 2] 카메라 기능
 with tab2:    
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json",
-        "Notion-Version": "2022-06-28"
-    }
-    
-    try:
-        response = requests.post(url, headers=headers)
-        
-        if response.status_code == 200:
-            results = response.json()
-            # st.write(results)
-        else:
-            st.error(f"API 호출 실패: {response.status_code} - {response.text}")
-            
-    except Exception as e:
-        st.error(f"에러 발생: {e}")
-        
+           
     events = [] # 빈 달력 이벤트 리스트 생성
-    raw_data = results.get('results', []) # 결과 리스트 가져오기
+    raw_data = fetch_notion_data() # 결과 리스트 가져오기
     
     for item in raw_data:
         props = item.get('properties', {})
