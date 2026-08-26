@@ -35,6 +35,9 @@ with st.sidebar:
 # 탭 메뉴 만들기
 tab1, tab2, tab3, tab4 = st.tabs(["대시보드","혈당 관리","카메라로 촬영","갤러리에서 업로드"])
 
+db_id = "3ab9ad098eee80b5a5d4e5b18f75802b"
+token = "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" # 시크릿으로 바꾸기 전 테스트용
+
 # 사진 찍기
 img_file = None
 
@@ -57,14 +60,11 @@ with tab1:
             st.metric("누적 칼로리", f"{total_cal} kcal")
         else:
             st.info("아직 기록된 식단이 없어요. 식단 기록을 시작해보세요.")
-except Exception as e:
-    st.error("데이터를 불러오지 못했습니다.")
+    except Exception as e:
+        st.error("데이터를 불러오지 못했습니다.")
     
 # [탭 2] 카메라 기능
-with tab2:
-    db_id = "3ab9ad098eee80b5a5d4e5b18f75802b"
-    token = "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" # 시크릿으로 바꾸기 전 테스트용
-    
+with tab2:    
     headers = {
         "Authorization": f"Bearer {token}",
         "Content-Type": "application/json",
