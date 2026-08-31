@@ -1,11 +1,11 @@
 import streamlit as st # 스트림릿 라이브러리 추가
 # import base64 # 이미지를 텍스트로 변환 openia = GPT
 import google.generativeai as genai
-import requests
+import requests, pandas
 import json, re # 문자열에서 숫자만 추출하는 라이브러리
 from PIL import Image # Genai
 from notion_client import Client
-from datetime import datetime
+from datetime import datetime, timedelta
 from streamlit_calendar import calendar
 
 # 노션 설정
@@ -72,11 +72,28 @@ with tab1:
         items = fetch_notion_data()
 
         if items:
-            st.write(f"총 {len(items)}개의 식단 기록이 있습니다.")
+            # 최근 7일 기준으로 필터링
+            today = datetime.now()
+            week_ago = today - timedelta(days=7)
 
-            # 최근 5개 식단 칼로리 합계
-            total_cal = sum(item['properties']['칼로리']['number'] for item in items if item['properties']['칼로리']['number'])
-            st.metric("누적 칼로리", f"{total_cal} kcal")
+            weekly_data = []
+            for item in items:
+                date_str = item['properties']['기록날짜']['date']['start']
+                record_date = datetime.strptime(date_str,"%Y-%m-%d")
+
+                if record_date >= week_ago:
+                    weekly_data.append(item['properties'])
+            
+            # 데이터 요약
+            st.write(f"최근 7일간 {len(weekly_data)}개의 식단 기록이 있습니다.")
+
+            # 주간 칼로리 합계
+            weekly_cal = sum(item['칼로리']['number'] for item in weekly_data if item['칼로리']['number'])
+            
+            # 시각화 그래프
+            st.bar_chart({item['식단명']['title'][0]['plain_text']: item['칼로리']['number'] for item in weekly_data})
+            
+            st.metric("이번 주 누적 칼로리", f"{weekly_cal} kcal")
         else:
             st.info("아직 기록된 식단이 없어요. 식단 기록을 시작해보세요.")
     except Exception as e:
