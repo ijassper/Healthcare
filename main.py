@@ -97,7 +97,7 @@ with tab1:
         else:
             st.info("아직 기록된 식단이 없어요. 식단 기록을 시작해보세요.")
     except Exception as e:
-        st.error("데이터를 불러오지 못했습니다.")
+        st.error("데이터를 불러오지 못했습니다.:{e})
     
 # [탭 2] 카메라 기능
 with tab2:    
