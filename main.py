@@ -1,7 +1,7 @@
 import streamlit as st # 스트림릿 라이브러리 추가
 # import base64 # 이미지를 텍스트로 변환 openia = GPT
 import google.generativeai as genai
-import requests, pandas
+import requests, pandas as pd
 import json, re # 문자열에서 숫자만 추출하는 라이브러리
 from PIL import Image # Genai
 from notion_client import Client
@@ -78,26 +78,37 @@ with tab1:
 
             weekly_data = []
             for item in items:
-                date_str = item['properties']['기록날짜']['date']['start']
-                record_date = datetime.strptime(date_str,"%Y-%m-%d")
+                # properties에 접근하여 데이터 추출
+                props = item['properties']
+                date_str = props['기록날짜']['date']['start']
+                record_date = datetime.strptime(date_str, "%Y-%m-%d")
 
                 if record_date >= week_ago:
-                    weekly_data.append(item['properties'])
+                    # 시각화와 계산을 위해 필요한 정보만 딕셔너리로 저장
+                    weekly_data.append({
+                        "식단명": props['식단명']['title'][0]['plain_text'],
+                        "칼로리": props['칼로리']['number'] if props['칼로리']['number'] else 0
+                    })
             
             # 데이터 요약
             st.write(f"최근 7일간 {len(weekly_data)}개의 식단 기록이 있습니다.")
 
-            # 주간 칼로리 합계
-            weekly_cal = sum(item['칼로리']['number'] for item in weekly_data if item['칼로리']['number'])
-            
-            # 시각화 그래프
-            st.bar_chart({item['식단명']['title'][0]['plain_text']: item['칼로리']['number'] for item in weekly_data})
-            
-            st.metric("이번 주 누적 칼로리", f"{weekly_cal} kcal")
+            if weekly_data:
+                # 3. DataFrame 변환
+                df = pd.DataFrame(weekly_data)
+        
+                # 4. 시각화 (가로형 그래프 적용)
+                st.bar_chart(df.set_index("식단명"), horizontal=True)
+                
+                # 5. 주간 칼로리 합계
+                weekly_cal = df["칼로리"].sum()
+                st.metric("이번 주 누적 칼로리", f"{weekly_cal} kcal")
+            else:
+                st.info("최근 7일간 기록된 식단이 없습니다.")
         else:
             st.info("아직 기록된 식단이 없어요. 식단 기록을 시작해보세요.")
     except Exception as e:
-        st.error("데이터를 불러오지 못했습니다.:{e})
+        st.error(f"데이터를 불러오지 못했습니다.:{e}")
     
 # [탭 2] 카메라 기능
 with tab2:    
