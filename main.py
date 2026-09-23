@@ -110,7 +110,7 @@ with tab1:
     except Exception as e:
         st.error(f"데이터를 불러오지 못했습니다.:{e}")
     
-# [탭 2] 카메라 기능
+# [탭 2] 혈당 관리
 with tab2:    
            
     events = [] # 빈 달력 이벤트 리스트 생성
@@ -148,7 +148,7 @@ with tab2:
             "right": "",
         },
         "initialView": "dayGridMonth",
-        "aspecRatio":0.8,
+        "aspectRatio":0.8,
         "height":"auto",
         "dayMaxEvents":True,
     }
