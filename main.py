@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 from streamlit_calendar import calendar
 
 # 노션 설정
-notion = Client(auth="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")
+notion = Client(auth=st.secrets["NOTION_TOKEN"])
 
 st.set_page_config(layout="centered", initial_sidebar_state="collapsed")
 
@@ -36,8 +36,8 @@ with st.sidebar:
 tab1, tab2, tab3, tab4 = st.tabs(["대시보드","혈당 관리","카메라로 촬영","갤러리에서 업로드"])
 
 def fetch_notion_data():
-    db_id = "3ab9ad098eee80b5a5d4e5b18f75802b"
-    token = "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" # 시크릿으로 바꾸기 전 테스트용
+    db_id = st.secrets["NOTION_DATABASE_ID"]
+    token = st.secrets["NOTION_TOKEN"]
     # 노션DB에서 데이터 가져오는 경로
     url = f"https://api.notion.com/v1/databases/{db_id}/query"
 
@@ -249,7 +249,7 @@ if img_file is not None:
         with st.spinner("AI 영양사가 분석 중입니다..."):
             try:
                 # Gemini 모델 불러오기
-                model = genai.GenerativeModel('gemini-2.5-flash')
+                model = genai.GenerativeModel('gemini-1.5-flash')
 
                 # AI에게 질문과 이미지 전달
                 response = model.generate_content([prompt, image])
@@ -275,7 +275,7 @@ if img_file is not None:
                 
                 # 노션에 저장
                 notion.pages.create(
-                    parent={"database_id": "3ab9ad098eee80b5a5d4e5b18f75802b"},
+                    parent={"database_id": st.secrets["NOTION_DATABASE_ID"]},
                     properties={
                         "식단명": {"title": [{"text": {"content": data["식단명"]}}]},
                         "영양정보": {"rich_text": [{"text": {"content": data["영양정보"]}}]},
