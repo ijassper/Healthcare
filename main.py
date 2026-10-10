@@ -248,16 +248,20 @@ with tab2:
             # 한국 시간(KST) 및 YYYY-MM-DD 날짜 추출
             date_str = datetime.now().strftime("%Y-%m-%d")
             time_str = ""
+            iso_start = date_str
             if created_at_val:
                 try:
                     if "T" in str(created_at_val):
                         dt = datetime.fromisoformat(str(created_at_val).replace("Z", "+00:00"))
                         date_str = dt.strftime("%Y-%m-%d")
                         time_str = dt.strftime("%H:%M")
+                        iso_start = dt.strftime("%Y-%m-%dT%H:%M:%S")
                     else:
                         date_str = str(created_at_val)[:10]
+                        iso_start = date_str
                 except Exception:
                     date_str = str(created_at_val)[:10]
+                    iso_start = date_str
 
             event_title = f"🍽️ {meal_name} ({calories} kcal)"
             if time_str:
@@ -265,11 +269,15 @@ with tab2:
 
             events.append({
                 "title": event_title,
-                "start": date_str,
-                "end": date_str,
+                "start": iso_start,
+                "end": iso_start,
                 "allDay": True,
+                "backgroundColor": "#2563EB",
+                "borderColor": "#1D4ED8",
+                "textColor": "#FFFFFF",
                 "resourceId": item.get("user_name") or user_name,
                 "extendedProps": {
+                    "id": item.get("id"),
                     "meal_name": meal_name,
                     "calories": calories,
                     "sugar": float(item.get("sugar") or 0),
@@ -291,19 +299,47 @@ with tab2:
             "center": "title",
             "right": "dayGridMonth,timeGridWeek",
         },
+        "initialDate": datetime.now().strftime("%Y-%m-%d"),
         "initialView": "dayGridMonth",
         "selectable": True,
         "navLinks": True,
-        "height": 650,
+        "contentHeight": 550,
+        "height": "auto",
+        "aspectRatio": 1.4,
     }
 
+    custom_css = """
+        .fc {
+            min-height: 550px !important;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .fc-view-harness {
+            min-height: 500px !important;
+        }
+        .fc-header-toolbar {
+            margin-bottom: 0.8rem !important;
+        }
+        .fc-event {
+            cursor: pointer !important;
+            border-radius: 4px !important;
+            padding: 3px 6px !important;
+            font-size: 0.85rem !important;
+            font-weight: 500 !important;
+        }
+    """
+
     # 4. 캘린더 컴포넌트 렌더링
-    state = calendar(events=events, options=calendar_options, key="healthcare_calendar")
+    state = calendar(
+        events=events,
+        options=calendar_options,
+        custom_css=custom_css,
+        key="healthcare_calendar"
+    )
 
     if 'show_detail' not in st.session_state:
         st.session_state.show_detail = False
 
-    if state.get("eventClick"):
+    if state and state.get("eventClick"):
         st.session_state.show_detail = True
         st.session_state.selected_event = state["eventClick"]["event"]["extendedProps"]
 
@@ -322,6 +358,33 @@ with tab2:
 
         st.write("#### 👩‍⚕️ 임상 영양사 AI 피드백")
         st.info(event_props.get("ai_feedback", ""))
+
+    # 5. 하단 식단 기록 타임라인 및 상세 리스트 (상시 확인 가능한 폴백 뷰)
+    st.divider()
+    st.write("### 📜 식단 기록 목록 및 피드백")
+    if raw_data:
+        for idx, item in enumerate(raw_data):
+            meal_title = item.get("meal_name") or "식단"
+            cal = item.get("calories") or 0
+            sug = item.get("sugar") or 0
+            carb = item.get("carbs") or 0
+            prot = item.get("protein") or 0
+            fat = item.get("fat") or 0
+            c_at = item.get("created_at") or ""
+            feedback = item.get("ai_feedback") or "분석 내용 없음"
+            
+            # 시간 표시 포맷
+            time_label = str(c_at)[:19].replace("T", " ") if c_at else "날짜 미상"
+            
+            with st.expander(f"🍽️ [{time_label}] {meal_title} ({cal} kcal, 당류 {sug}g)", expanded=(idx == 0)):
+                col_a, col_b, col_c, col_d = st.columns(4)
+                col_a.metric("칼로리", f"{cal} kcal")
+                col_b.metric("당류", f"{sug} g")
+                col_c.metric("탄수화물", f"{carb} g")
+                col_d.metric("단백질 / 지방", f"{prot}g / {fat}g")
+                
+                st.markdown("##### 👩‍⚕️ AI 임상 영양사 코칭")
+                st.markdown(feedback)
 
 # -------------------------------------------------------------
 # [탭 3] 카메라 촬영 기능
