@@ -352,7 +352,7 @@ if img_file is not None:
     if st.button("영양소 분석하기", type="primary", use_container_width=True):
         with st.spinner("AI 영양사가 영양 성분 및 혈당 영향을 분석 중입니다..."):
             try:
-                model = genai.GenerativeModel('gemini-1.5-flash')
+                model = genai.GenerativeModel('gemini-2.5-flash')
                 response = model.generate_content([prompt, image])
                 st.session_state.ai_result = response.text
                 st.success("분석 완료!")
