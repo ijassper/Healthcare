@@ -224,55 +224,57 @@ with tab1:
 # [탭 2] 혈당 관리 (캘린더 뷰)
 # -------------------------------------------------------------
 with tab2:
-    events = []
+    st.subheader(f"📅 {user_name}님의 식단 및 혈당 캘린더")
+
+    # 1. 데이터 조회 (현재 사용자 기준)
     raw_data = fetch_supabase_data(user_name)
     if not raw_data:
         raw_data = fetch_supabase_data()
 
+    # 2. 데이터가 없을 경우 안내 문구 표시
+    if not raw_data:
+        st.info("아직 등록된 식단 기록이 없습니다.")
+
+    # 3. 캘린더 이벤트 매핑 (FullCalendar 표준 포맷)
+    events = []
     for item in raw_data:
         try:
-            title = item.get("meal_name") or "식단 기록"
-            created_at_str = item.get("created_at") or ""
-            start_date = created_at_str[:10] if created_at_str else datetime.now().strftime("%Y-%m-%d")
-
-            sugar_val = item.get("sugar", 0)
-            cal_val = item.get("calories", 0)
-            carbs_val = item.get("carbs", 0)
-            protein_val = item.get("protein", 0)
-            fat_val = item.get("fat", 0)
-            feedback = item.get("ai_feedback") or "분석 내용 없음"
-
-            if start_date:
-                events.append({
-                    "title": f"{title} ({cal_val}kcal / 당{sugar_val}g)",
-                    "start": start_date,
-                    "extendedProps": {
-                        "meal_name": title,
-                        "calories": cal_val,
-                        "sugar": sugar_val,
-                        "carbs": carbs_val,
-                        "protein": protein_val,
-                        "fat": fat_val,
-                        "ai_feedback": feedback,
-                        "user_name": item.get("user_name", "")
-                    }
-                })
+            meal_name = item.get("meal_name") or "식단"
+            calories = item.get("calories", 0)
+            created_at_val = item.get("created_at") or datetime.now().isoformat()
+            
+            events.append({
+                "title": f"🍽️ {meal_name} ({calories} kcal)",
+                "start": created_at_val,
+                "end": created_at_val,
+                "resourceId": item.get("user_name") or user_name,
+                "extendedProps": {
+                    "meal_name": meal_name,
+                    "calories": calories,
+                    "sugar": item.get("sugar", 0),
+                    "carbs": item.get("carbs", 0),
+                    "protein": item.get("protein", 0),
+                    "fat": item.get("fat", 0),
+                    "ai_feedback": item.get("ai_feedback") or "분석 내용 없음",
+                    "user_name": item.get("user_name") or user_name
+                }
+            })
         except Exception:
             continue
 
     calendar_options = {
         "headerToolbar": {
-            "left": "prev,next",
+            "left": "today prev,next",
             "center": "title",
-            "right": "",
+            "right": "dayGridMonth,timeGridWeek,timeGridDay",
         },
         "initialView": "dayGridMonth",
-        "aspectRatio": 0.8,
-        "height": "auto",
-        "dayMaxEvents": True,
+        "selectable": True,
+        "navLinks": True,
     }
 
-    state = calendar(events=events, options=calendar_options)
+    # 4. 캘린더 컴포넌트 렌더링
+    state = calendar(events=events, options=calendar_options, key="healthcare_calendar")
 
     if 'show_detail' not in st.session_state:
         st.session_state.show_detail = False
