@@ -226,37 +226,60 @@ with tab1:
 with tab2:
     st.subheader(f"📅 {user_name}님의 식단 및 혈당 캘린더")
 
-    # 1. 데이터 조회 (현재 사용자 기준)
+    # 1. 데이터 조회 (현재 사용자 기준 및 폴백)
     raw_data = fetch_supabase_data(user_name)
-    if not raw_data:
+    if not raw_data and user_name.strip():
         raw_data = fetch_supabase_data()
 
     # 2. 데이터가 없을 경우 안내 문구 표시
     if not raw_data:
-        st.info("아직 등록된 식단 기록이 없습니다.")
+        st.info("아직 등록된 식단 기록이 없습니다. 사진을 촬영하거나 업로드하여 첫 식단을 기록해 보세요!")
+    else:
+        st.caption(f"총 {len(raw_data)}건의 식단 기록이 캘린더에 표시됩니다.")
 
     # 3. 캘린더 이벤트 매핑 (FullCalendar 표준 포맷)
     events = []
     for item in raw_data:
         try:
             meal_name = item.get("meal_name") or "식단"
-            calories = item.get("calories", 0)
-            created_at_val = item.get("created_at") or datetime.now().isoformat()
+            calories = int(float(item.get("calories") or 0))
+            created_at_val = item.get("created_at") or ""
             
+            # 한국 시간(KST) 및 YYYY-MM-DD 날짜 추출
+            date_str = datetime.now().strftime("%Y-%m-%d")
+            time_str = ""
+            if created_at_val:
+                try:
+                    if "T" in str(created_at_val):
+                        dt = datetime.fromisoformat(str(created_at_val).replace("Z", "+00:00"))
+                        date_str = dt.strftime("%Y-%m-%d")
+                        time_str = dt.strftime("%H:%M")
+                    else:
+                        date_str = str(created_at_val)[:10]
+                except Exception:
+                    date_str = str(created_at_val)[:10]
+
+            event_title = f"🍽️ {meal_name} ({calories} kcal)"
+            if time_str:
+                event_title = f"[{time_str}] 🍽️ {meal_name} ({calories} kcal)"
+
             events.append({
-                "title": f"🍽️ {meal_name} ({calories} kcal)",
-                "start": created_at_val,
-                "end": created_at_val,
+                "title": event_title,
+                "start": date_str,
+                "end": date_str,
+                "allDay": True,
                 "resourceId": item.get("user_name") or user_name,
                 "extendedProps": {
                     "meal_name": meal_name,
                     "calories": calories,
-                    "sugar": item.get("sugar", 0),
-                    "carbs": item.get("carbs", 0),
-                    "protein": item.get("protein", 0),
-                    "fat": item.get("fat", 0),
+                    "sugar": float(item.get("sugar") or 0),
+                    "carbs": float(item.get("carbs") or 0),
+                    "protein": float(item.get("protein") or 0),
+                    "fat": float(item.get("fat") or 0),
                     "ai_feedback": item.get("ai_feedback") or "분석 내용 없음",
-                    "user_name": item.get("user_name") or user_name
+                    "user_name": item.get("user_name") or user_name,
+                    "record_date": date_str,
+                    "record_time": time_str
                 }
             })
         except Exception:
@@ -266,11 +289,12 @@ with tab2:
         "headerToolbar": {
             "left": "today prev,next",
             "center": "title",
-            "right": "dayGridMonth,timeGridWeek,timeGridDay",
+            "right": "dayGridMonth,timeGridWeek",
         },
         "initialView": "dayGridMonth",
         "selectable": True,
         "navLinks": True,
+        "height": 650,
     }
 
     # 4. 캘린더 컴포넌트 렌더링
@@ -283,10 +307,12 @@ with tab2:
         st.session_state.show_detail = True
         st.session_state.selected_event = state["eventClick"]["event"]["extendedProps"]
 
-    if st.session_state.show_detail and 'selected_event' in st.session_state:
+    if st.session_state.get("show_detail") and 'selected_event' in st.session_state:
         event_props = st.session_state.selected_event
         st.divider()
         st.write(f"### 📋 {event_props.get('meal_name')} 상세 분석 리포트")
+        if event_props.get("record_time"):
+            st.caption(f"기록 일시: {event_props.get('record_date')} {event_props.get('record_time')} | 사용자: {event_props.get('user_name')}")
         
         c1, c2, c3, c4 = st.columns(4)
         c1.metric("칼로리", f"{event_props.get('calories', 0)} kcal")
